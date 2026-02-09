@@ -100,4 +100,66 @@
 
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
+## user_problem_statement: "BTI tour & travel web app with WhatsApp-first flow and admin UI"
+## backend:
+##   - task: "API health + enquiries placeholder"
+##     implemented: true
+##     working: "NA"
+##     file: "/app/app/api/[[...path]]/route.js"
+##     stuck_count: 0
+##     priority: "high"
+##     needs_retesting: true
+##     status_history:
+##       - working: "NA"
+##         agent: "main"
+##         comment: "Implemented catch-all API with /api/health and /api/enquiries placeholder responses."
+## frontend:
+##   - task: "Landing page + Plan-a-Tour WhatsApp flow"
+##     implemented: true
+##     working: "NA"
+##     file: "/app/app/page.js"
+##     stuck_count: 0
+##     priority: "high"
+##     needs_retesting: false
+##     status_history:
+##       - working: "NA"
+##         agent: "main"
+##         comment: "Built landing page, cab/holiday/hotel sections, Plan-a-Tour form with WhatsApp message generation."
+##   - task: "Admin UI skeleton"
+##     implemented: true
+##     working: "NA"
+##     file: "/app/app/admin/page.js"
+##     stuck_count: 0
+##     priority: "medium"
+##     needs_retesting: false
+##     status_history:
+##       - working: "NA"
+##         agent: "main"
+##         comment: "Added admin layout and section cards with Firebase-not-configured notice."
+##   - task: "SEO programmatic pages"
+##     implemented: true
+##     working: "NA"
+##     file: "/app/app/[slug]/page.js"
+##     stuck_count: 0
+##     priority: "medium"
+##     needs_retesting: false
+##     status_history:
+##       - working: "NA"
+##         agent: "main"
+##         comment: "Added programmatic SEO pages for city/service slugs with metadata."
+## metadata:
+##   created_by: "main_agent"
+##   version: "1.0"
+##   test_sequence: 1
+##   run_ui: false
+## test_plan:
+##   current_focus:
+##     - "API health + enquiries placeholder"
+##   stuck_tasks: []
+##   test_all: false
+##   test_priority: "high_first"
+## agent_communication:
+##   - agent: "main"
+##     message: "Implemented new backend API route; please test GET /api, GET /api/health, POST /api/enquiries expecting 501."
+
 #====================================================================================================
