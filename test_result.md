@@ -156,7 +156,10 @@
 ##   test_sequence: 1
 ##   run_ui: false
 ## test_plan:
-##   current_focus: []
+##   current_focus:
+##     - "Landing page + Plan-a-Tour WhatsApp flow"
+##     - "Admin UI skeleton"
+##     - "SEO programmatic pages"
 ##   stuck_tasks: []
 ##   test_all: false
 ##   test_priority: "high_first"
