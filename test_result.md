@@ -156,8 +156,7 @@
 ##   test_sequence: 1
 ##   run_ui: false
 ## test_plan:
-##   current_focus:
-##     - "API health + enquiries placeholder"
+##   current_focus: []
 ##   stuck_tasks: []
 ##   test_all: false
 ##   test_priority: "high_first"
