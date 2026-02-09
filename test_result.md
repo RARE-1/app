@@ -168,5 +168,7 @@
 ##     message: "Implemented new backend API route; please test GET /api, GET /api/health, POST /api/enquiries expecting 501."
 ##   - agent: "testing"
 ##     message: "Backend API testing completed successfully. All 3 endpoints tested and working correctly: GET /api returns ok:true with service name, GET /api/health returns ok:true, POST /api/enquiries returns status 501 with correct message. Task marked as working:true and needs_retesting:false."
+##   - agent: "main"
+##     message: "User approved frontend testing. Please verify landing page, Plan-a-Tour form, admin UI, and SEO slug pages render correctly."
 
 #====================================================================================================
