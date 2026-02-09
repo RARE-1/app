@@ -113,6 +113,9 @@
 ##       - working: "NA"
 ##         agent: "main"
 ##         comment: "Implemented catch-all API with /api/health and /api/enquiries placeholder responses."
+##       - working: true
+##         agent: "testing"
+##         comment: "Backend API testing completed successfully. All 3 endpoints working as expected: GET /api returns ok:true with service name 'Brothers Travel India API', GET /api/health returns ok:true, POST /api/enquiries returns status 501 with correct message about Firebase not connected."
 ## frontend:
 ##   - task: "Landing page + Plan-a-Tour WhatsApp flow"
 ##     implemented: true
