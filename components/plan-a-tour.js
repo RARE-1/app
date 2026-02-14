@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { CalendarClock, MapPin, Users } from 'lucide-react'
+import { normalizePhoneNumber } from '@/lib/contact'
 
 const initialStop = () => ({ id: `${Date.now()}-${Math.random()}`, value: '' })
 
@@ -20,7 +21,8 @@ function App({ whatsappNumber, mapsReady }) {
   const [notes, setNotes] = useState('')
   const [statusMessage, setStatusMessage] = useState('')
 
-  const whatsappReady = Boolean(whatsappNumber)
+  const normalizedWhatsAppNumber = normalizePhoneNumber(whatsappNumber)
+  const whatsappReady = Boolean(normalizedWhatsAppNumber)
 
   const message = useMemo(() => {
     const locations = [
@@ -68,7 +70,7 @@ function App({ whatsappNumber, mapsReady }) {
       return
     }
 
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+    const url = `https://wa.me/${normalizedWhatsAppNumber}?text=${encodeURIComponent(message)}`
     window.open(url, '_blank', 'noopener,noreferrer')
     setStatusMessage('Opening WhatsApp with your tour details...')
   }

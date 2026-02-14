@@ -1,81 +1,10 @@
-import { Bus, Building2, CarFront, MapPin, PhoneCall, Route, Users } from 'lucide-react'
+import Link from 'next/link'
+import { Bus, Building2, CarFront, Lock, MapPin, PhoneCall, Route, Users } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import PlanATour from '@/components/plan-a-tour'
-
-const heroImage = 'https://images.unsplash.com/photo-1651307114090-0fa8585aa10f'
-const destinations = [
-  {
-    name: 'Ladakh Circuit',
-    description: 'High-altitude group expeditions with premium transport.',
-    image: 'https://images.unsplash.com/photo-1705744145776-8a86e3704d3d',
-  },
-  {
-    name: 'Golden Triangle',
-    description: 'Delhi, Agra, Jaipur with expert local planning.',
-    image: 'https://images.unsplash.com/photo-1583140743264-18a380716cce',
-  },
-  {
-    name: 'Kerala Backwaters',
-    description: 'Luxury cab & hotel coordination across Kerala.',
-    image: 'https://images.unsplash.com/photo-1592985448758-22a0d8356dd5',
-  },
-]
-
-const vehicleCategories = [
-  {
-    title: 'Group Transport',
-    subtitle: '26+ seat buses, Tempo Travellers, Force Urbania.',
-    icon: Bus,
-  },
-  {
-    title: 'Small Group Cabs',
-    subtitle: 'Dzire, Aura, Innova Crysta, Hycross, Ertiga.',
-    icon: CarFront,
-  },
-  {
-    title: 'Luxury Fleet',
-    subtitle: 'Audi, Mercedes, BMW, Kia Carnival and more.',
-    icon: CarFront,
-  },
-]
-
-const cabBookingOptions = [
-  {
-    category: 'Sedan',
-    vehicles: 'Dzire, Aura',
-    message: 'I want to book a Sedan for my trip.',
-  },
-  {
-    category: 'MPV',
-    vehicles: 'Innova Crysta, Hycross, Ertiga',
-    message: 'I want to book an MPV for my trip.',
-  },
-  {
-    category: 'Traveller',
-    vehicles: 'Tempo Traveller, Force Urbania',
-    message: 'I want to book a Traveller for my group.',
-  },
-  {
-    category: 'Bus',
-    vehicles: '26+ seat buses',
-    message: 'I want to book a Bus for a group journey.',
-  },
-  {
-    category: 'Luxury',
-    vehicles: 'Audi, Mercedes, BMW',
-    message: 'I want to book a Luxury Cab.',
-  },
-]
-
-const galleryImages = [
-  'https://images.unsplash.com/photo-1610698517225-78fcfe40aceb',
-  'https://images.unsplash.com/photo-1654041961945-f86f6caffe53',
-  'https://images.unsplash.com/photo-1583140743264-18a380716cce',
-  'https://images.unsplash.com/photo-1592985448758-22a0d8356dd5',
-  'https://images.unsplash.com/photo-1705744145776-8a86e3704d3d',
-  'https://images.unsplash.com/photo-1651307114090-0fa8585aa10f',
-]
+import { getSiteContent } from '@/lib/site-content-store'
+import { normalizePhoneNumber } from '@/lib/contact'
 
 const navItems = [
   { label: 'Booking', href: '#booking' },
@@ -88,9 +17,22 @@ const navItems = [
   { label: 'Plan a Tour', href: '#plan-a-tour' },
 ]
 
-function App() {
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ''
-  const phoneNumber = process.env.NEXT_PUBLIC_PHONE_NUMBER || ''
+const iconByName = {
+  Bus,
+  CarFront,
+}
+
+async function App() {
+  const content = await getSiteContent()
+
+  const envWhatsApp = normalizePhoneNumber(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '')
+  const envPhone = normalizePhoneNumber(
+    process.env.NEXT_PUBLIC_PHONE_NUMBER || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ''
+  )
+
+  const whatsappNumber = normalizePhoneNumber(content?.contact?.whatsappNumber || envWhatsApp)
+  const phoneNumber = normalizePhoneNumber(content?.contact?.phoneNumber || envPhone || whatsappNumber)
+
   const isAnalyticsReady = Boolean(process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID)
   const isWhatsAppReady = Boolean(whatsappNumber)
 
@@ -98,6 +40,7 @@ function App() {
     if (!isWhatsAppReady) {
       return '#'
     }
+
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
   }
 
@@ -134,7 +77,7 @@ function App() {
         <section className="relative overflow-hidden" id="booking">
           <div className="absolute inset-0">
             <img
-              src={heroImage}
+              src={content.heroImage}
               alt="Scenic travel landscape"
               className="h-full w-full object-cover opacity-40"
               loading="lazy"
@@ -158,10 +101,7 @@ function App() {
                     <a href="#plan-a-tour">Plan a Tour on WhatsApp</a>
                   </Button>
                   <Button asChild size="lg" variant="outline">
-                    <a
-                      href={phoneNumber ? `tel:${phoneNumber}` : '#'}
-                      aria-disabled={!phoneNumber}
-                    >
+                    <a href={phoneNumber ? `tel:${phoneNumber}` : '#'} aria-disabled={!phoneNumber}>
                       <PhoneCall className="mr-2 h-4 w-4" />
                       Call Now
                     </a>
@@ -213,17 +153,21 @@ function App() {
                 every journey smooth, safe, and on time.
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
-                {vehicleCategories?.map((item) => (
-                  <Card key={item.title} className="p-4">
-                    <div className="flex items-start gap-3">
-                      <item.icon className="mt-1 h-5 w-5 text-primary" />
-                      <div>
-                        <p className="font-semibold">{item.title}</p>
-                        <p className="text-sm text-muted-foreground">{item.subtitle}</p>
+                {content.vehicleCategories?.map((item) => {
+                  const ItemIcon = iconByName[item.icon] || CarFront
+
+                  return (
+                    <Card key={item.title} className="p-4">
+                      <div className="flex items-start gap-3">
+                        <ItemIcon className="mt-1 h-5 w-5 text-primary" />
+                        <div>
+                          <p className="font-semibold">{item.title}</p>
+                          <p className="text-sm text-muted-foreground">{item.subtitle}</p>
+                        </div>
                       </div>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  )
+                })}
               </div>
             </div>
             <div className="grid gap-4">
@@ -257,7 +201,7 @@ function App() {
               </p>
             </div>
             <div className="grid gap-6 md:grid-cols-3">
-              {(destinations ?? []).map((destination) => (
+              {(content.destinations ?? []).map((destination) => (
                 <Card key={destination.name} className="overflow-hidden">
                   <img
                     src={destination.image}
@@ -322,7 +266,7 @@ function App() {
               </p>
             </div>
             <div className="grid gap-6 md:grid-cols-2">
-              {(cabBookingOptions ?? []).map((option) => (
+              {(content.cabBookingOptions ?? []).map((option) => (
                 <Card key={option.category} className="p-5">
                   <div className="flex items-center justify-between">
                     <div>
@@ -361,7 +305,10 @@ function App() {
                 on WhatsApp in one click.
               </p>
             </div>
-            <PlanATour whatsappNumber={whatsappNumber} mapsReady={Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)} />
+            <PlanATour
+              whatsappNumber={whatsappNumber}
+              mapsReady={Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)}
+            />
           </div>
         </section>
 
@@ -372,7 +319,7 @@ function App() {
               <p className="text-muted-foreground">Premium experiences curated by BTI.</p>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
-              {(galleryImages ?? []).map((image, index) => (
+              {(content.galleryImages ?? []).map((image, index) => (
                 <img
                   key={`${image}-${index}`}
                   src={image}
@@ -389,13 +336,11 @@ function App() {
           <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
               <h3 className="text-3xl font-semibold">Office Address</h3>
-              <p className="text-muted-foreground">
-                BTI Operations Hub, New Delhi (exact address will appear once confirmed).
-              </p>
+              <p className="text-muted-foreground">{content.office?.address}</p>
               <div className="mt-4 space-y-2 text-sm">
                 <p>Phone: {phoneNumber || 'Add NEXT_PUBLIC_PHONE_NUMBER to enable call links.'}</p>
                 <p>WhatsApp: {whatsappNumber || 'Add NEXT_PUBLIC_WHATSAPP_NUMBER to enable WhatsApp links.'}</p>
-                <p>Email: info@brotherstravelindia.com</p>
+                <p>Email: {content.office?.email}</p>
               </div>
             </div>
             <Card className="p-5">
@@ -412,12 +357,18 @@ function App() {
         </section>
       </main>
 
+      <Link
+        href="/admin"
+        className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 rounded-full border border-border bg-background/90 px-4 py-2 text-xs font-semibold text-muted-foreground opacity-30 shadow-sm transition hover:opacity-100"
+      >
+        <Lock className="h-3.5 w-3.5" />
+        Secret Login
+      </Link>
+
       <footer className="border-t border-border bg-background">
         <div className="container flex flex-col gap-3 py-6 text-sm text-muted-foreground">
           <p>© 2025 Brothers Travel India. All rights reserved.</p>
-          {!isAnalyticsReady ? (
-            <p>Analytics disabled. Set NEXT_PUBLIC_GOOGLE_ANALYTICS_ID to enable tracking.</p>
-          ) : null}
+          {!isAnalyticsReady ? <p>Analytics disabled. Set NEXT_PUBLIC_GOOGLE_ANALYTICS_ID to enable tracking.</p> : null}
         </div>
       </footer>
     </div>
