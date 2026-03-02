@@ -2,9 +2,21 @@ import { NextResponse } from 'next/server'
 import { getSiteContent, saveSiteContent } from '@/lib/site-content-store'
 import { isAdminRequest } from '@/lib/admin-auth'
 
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   const content = await getSiteContent()
   return NextResponse.json({ ok: true, content })
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      Allow: 'GET, PUT, OPTIONS',
+    },
+  })
 }
 
 export async function PUT(request) {
