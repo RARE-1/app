@@ -2,7 +2,9 @@ import { ShieldCheck } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 
 function App({ children }) {
-  const firebaseReady = Boolean(process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID)
+  const adminReady = Boolean(
+    process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD && process.env.ADMIN_SECRET
+  )
 
   return (
     <div className="min-h-screen bg-muted/30 text-foreground">
@@ -15,10 +17,10 @@ function App({ children }) {
               <h1 className="text-2xl font-semibold">Control Center</h1>
             </div>
           </div>
-          {!firebaseReady ? (
+          {!adminReady ? (
             <Card className="border border-dashed border-border bg-muted/40 p-3 text-sm text-muted-foreground">
-              Firebase is not configured yet. Add Firebase keys in .env to enable authentication and data
-              management.
+              Admin auth is not fully configured. Add ADMIN_USERNAME, ADMIN_PASSWORD, and ADMIN_SECRET in
+              .env to enable secure admin access.
             </Card>
           ) : null}
         </div>
