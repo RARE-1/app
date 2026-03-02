@@ -24,11 +24,20 @@ export async function PUT(request) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
   }
 
+  let payload
   try {
-    const payload = await request.json()
+    payload = await request.json()
+  } catch {
+    return NextResponse.json({ ok: false, error: 'Invalid JSON payload' }, { status: 400 })
+  }
+
+  try {
     const content = await saveSiteContent(payload)
     return NextResponse.json({ ok: true, content })
   } catch {
-    return NextResponse.json({ ok: false, error: 'Invalid payload' }, { status: 400 })
+    return NextResponse.json(
+      { ok: false, error: 'Failed to save content. Check Firebase admin environment variables.' },
+      { status: 500 }
+    )
   }
 }
