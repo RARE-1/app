@@ -34,7 +34,7 @@ dist
 *token.json*
 *credentials.json*
 .env
-
+.env.example
 # Logs and debug files
 npm-debug.log*
 yarn-debug.log*
