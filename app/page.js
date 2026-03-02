@@ -6,6 +6,8 @@ import PlanATour from '@/components/plan-a-tour'
 import { getSiteContent } from '@/lib/site-content-store'
 import { normalizePhoneNumber } from '@/lib/contact'
 
+export const dynamic = 'force-dynamic'
+
 const navItems = [
   { label: 'Booking', href: '#booking' },
   { label: 'Holiday Booking', href: '#holiday-booking' },
