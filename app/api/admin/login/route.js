@@ -5,18 +5,22 @@ const SEVEN_DAYS = 60 * 60 * 24 * 7
 
 export async function POST(request) {
   const adminSecret = getAdminSecret()
-  if (!adminSecret) {
+  const adminUsername = process.env.ADMIN_USERNAME || ''
+  const adminPassword = process.env.ADMIN_PASSWORD || ''
+
+  if (!adminSecret || !adminUsername || !adminPassword) {
     return NextResponse.json(
-      { ok: false, error: 'Admin secret is not configured on server.' },
+      { ok: false, error: 'Admin credentials are not configured on server.' },
       { status: 500 }
     )
   }
 
   try {
     const payload = await request.json()
+    const username = typeof payload?.username === 'string' ? payload.username : ''
     const password = typeof payload?.password === 'string' ? payload.password : ''
 
-    if (!password || password !== adminSecret) {
+    if (!username || !password || username !== adminUsername || password !== adminPassword) {
       return NextResponse.json({ ok: false, error: 'Invalid credentials' }, { status: 401 })
     }
 

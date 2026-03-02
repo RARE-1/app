@@ -17,6 +17,7 @@ function App() {
   const [saving, setSaving] = useState(false)
   const [sessionConfigured, setSessionConfigured] = useState(false)
   const [authenticated, setAuthenticated] = useState(false)
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [status, setStatus] = useState('')
 
@@ -91,7 +92,7 @@ function App() {
     const response = await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ username, password }),
     })
 
     const payload = await response.json()
@@ -102,6 +103,7 @@ function App() {
     }
 
     setPassword('')
+    setUsername('')
     await loadSessionAndData()
   }
 
@@ -185,7 +187,8 @@ function App() {
   if (!sessionConfigured) {
     return (
       <Card className="p-5 text-sm text-muted-foreground">
-        Admin secret is missing. Add `ADMIN_SECRET` to `.env` and restart the app.
+        Admin credentials are missing. Add `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and `ADMIN_SECRET` to
+        `.env` and restart the app.
       </Card>
     )
   }
@@ -195,12 +198,20 @@ function App() {
       <div className="grid gap-4">
         <div>
           <h2 className="text-3xl font-semibold">Admin Login</h2>
-          <p className="text-muted-foreground">Use the secret password configured in `ADMIN_SECRET`.</p>
+          <p className="text-muted-foreground">Use the admin username and password configured on server.</p>
         </div>
         <Card className="max-w-md p-5">
           <form onSubmit={login} className="grid gap-4">
             <div>
-              <label className="text-sm font-medium">Secret Password</label>
+              <label className="text-sm font-medium">Username</label>
+              <Input
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                placeholder="Enter admin username"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Password</label>
               <Input
                 type="password"
                 value={password}
