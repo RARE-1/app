@@ -34,7 +34,8 @@ export async function PUT(request) {
   try {
     const content = await saveSiteContent(payload)
     return NextResponse.json({ ok: true, content })
-  } catch {
+  } catch (error) {
+    console.error('Failed to save site content.', error)
     return NextResponse.json(
       { ok: false, error: 'Failed to save content. Check Firebase admin environment variables.' },
       { status: 500 }

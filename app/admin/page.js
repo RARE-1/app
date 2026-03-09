@@ -43,42 +43,43 @@ function App() {
   const loadSessionAndData = async () => {
     setLoading(true)
     setStatus('')
+    try {
+      const sessionResponse = await fetch('/api/admin/session', { cache: 'no-store' })
+      const sessionPayload = await sessionResponse.json()
 
-    const sessionResponse = await fetch('/api/admin/session', { cache: 'no-store' })
-    const sessionPayload = await sessionResponse.json()
+      setSessionConfigured(Boolean(sessionPayload?.configured))
+      setAuthenticated(Boolean(sessionPayload?.authenticated))
 
-    setSessionConfigured(Boolean(sessionPayload?.configured))
-    setAuthenticated(Boolean(sessionPayload?.authenticated))
+      if (!sessionPayload?.authenticated) {
+        return
+      }
 
-    if (!sessionPayload?.authenticated) {
+      const contentResponse = await fetch('/api/content', { cache: 'no-store' })
+      const contentPayload = await contentResponse.json()
+
+      if (!contentPayload?.ok) {
+        setStatus(contentPayload?.error || 'Failed to load content.')
+        return
+      }
+
+      const content = contentPayload.content || {}
+
+      setHeroImage(content.heroImage || '')
+      setDestinations(asArray(content.destinations).length ? content.destinations : [emptyDestination])
+      setGalleryImagesText(asArray(content.galleryImages).join('\n'))
+      setVehicleCategories(
+        asArray(content.vehicleCategories).length ? content.vehicleCategories : [emptyVehicleCategory]
+      )
+      setCabOptions(asArray(content.cabBookingOptions).length ? content.cabBookingOptions : [emptyCabOption])
+      setOfficeAddress(content.office?.address || '')
+      setOfficeEmail(content.office?.email || '')
+      setWhatsappNumber(content.contact?.whatsappNumber || '')
+      setPhoneNumber(content.contact?.phoneNumber || '')
+    } catch {
+      setStatus('Failed to reach admin API. Check server env config and logs.')
+    } finally {
       setLoading(false)
-      return
     }
-
-    const contentResponse = await fetch('/api/content', { cache: 'no-store' })
-    const contentPayload = await contentResponse.json()
-
-    if (!contentPayload?.ok) {
-      setStatus('Failed to load content.')
-      setLoading(false)
-      return
-    }
-
-    const content = contentPayload.content || {}
-
-    setHeroImage(content.heroImage || '')
-    setDestinations(asArray(content.destinations).length ? content.destinations : [emptyDestination])
-    setGalleryImagesText(asArray(content.galleryImages).join('\n'))
-    setVehicleCategories(
-      asArray(content.vehicleCategories).length ? content.vehicleCategories : [emptyVehicleCategory]
-    )
-    setCabOptions(asArray(content.cabBookingOptions).length ? content.cabBookingOptions : [emptyCabOption])
-    setOfficeAddress(content.office?.address || '')
-    setOfficeEmail(content.office?.email || '')
-    setWhatsappNumber(content.contact?.whatsappNumber || '')
-    setPhoneNumber(content.contact?.phoneNumber || '')
-
-    setLoading(false)
   }
 
   useEffect(() => {
@@ -88,29 +89,36 @@ function App() {
   const login = async (event) => {
     event.preventDefault()
     setStatus('')
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      })
 
-    const response = await fetch('/api/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    })
+      const payload = await response.json()
 
-    const payload = await response.json()
+      if (!response.ok || !payload?.ok) {
+        setStatus(payload?.error || 'Login failed.')
+        return
+      }
 
-    if (!response.ok || !payload?.ok) {
-      setStatus(payload?.error || 'Login failed.')
-      return
+      setPassword('')
+      setUsername('')
+      await loadSessionAndData()
+    } catch {
+      setStatus('Login request failed. Check network and server logs.')
     }
-
-    setPassword('')
-    setUsername('')
-    await loadSessionAndData()
   }
 
   const logout = async () => {
-    await fetch('/api/admin/logout', { method: 'POST' })
-    setAuthenticated(false)
-    setStatus('Logged out.')
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' })
+      setAuthenticated(false)
+      setStatus('Logged out.')
+    } catch {
+      setStatus('Logout request failed.')
+    }
   }
 
   const updateListItem = (setter, list, index, key, value) => {
@@ -162,22 +170,26 @@ function App() {
       },
     }
 
-    const response = await fetch('/api/content', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
+    try {
+      const response = await fetch('/api/content', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
 
-    const result = await response.json()
+      const result = await response.json()
 
-    if (!response.ok || !result?.ok) {
-      setStatus(result?.error || 'Save failed.')
+      if (!response.ok || !result?.ok) {
+        setStatus(result?.error || 'Save failed.')
+        return
+      }
+
+      setStatus('Saved successfully.')
+    } catch {
+      setStatus('Save request failed. Check server connectivity.')
+    } finally {
       setSaving(false)
-      return
     }
-
-    setStatus('Saved successfully.')
-    setSaving(false)
   }
 
   if (loading) {
